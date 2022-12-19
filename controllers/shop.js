@@ -81,9 +81,9 @@ exports.postCart = (req, res, next) => {
     return cart.getProducts({where : {id : prodId}});
   })
   .then(products =>{
-    if(products.length > 0){
-      product = products[0];
-    };
+    // if(products.length > 0){
+    //   product = products[0];
+    // };
     if(product){
      const oldQuantity = product.cartItem.quantity;
      newQuantity = oldQuantity + 1;
@@ -97,9 +97,11 @@ exports.postCart = (req, res, next) => {
     });
   })
   .then(()=>{
-    res.redirect('/cart');
+    res.status(200).json({ success : true , message : 'product is added successfully'})
    })
-  .catch(err => console.log(err));
+  .catch(err =>{
+    res.status(500).json({success : false , message : 'Error'});
+  });
 
 };
 

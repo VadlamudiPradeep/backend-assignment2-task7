@@ -41,7 +41,10 @@ parentContainer.addEventListener('click',(e)=>{
         },2500)
     }
     if (e.target.className=='cart-btn-bottom' || e.target.className=='cart-bottom' || e.target.className=='cart-holder'){
-        document.querySelector('#cart').style = "display:block;"
+        var cartContainer = document.getElementById('cart')
+        cartContainer.innerHTML ='';
+        getCartDetails();
+     //   document.querySelector('#cart').style = "display:block;"
     }
     if (e.target.className=='cancel'){
         document.querySelector('#cart').style = "display:none;"
@@ -66,10 +69,11 @@ parentContainer.addEventListener('click',(e)=>{
     }
 });
 
+
 window.addEventListener('DOMContentLoaded', ()=>{
     axios.get('http://localhost:3000/products')
     .then((data)=>{
-        console.log(data);
+     //   console.log(data);
         if(data.request.status === 200){
             const products = data.data.products;
             var parentSection = document.getElementById('Products');
@@ -90,7 +94,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
 function addToCart(productId){
     axios.post('http://localhost:3000/cart',{productId : productId})
     .then((response)=>{
-    console.log(response);
     if(response.status === 200){
       notifyUsers(response.data.message);
     }
@@ -99,6 +102,9 @@ function addToCart(productId){
         notifyUsers(response.data.message)
     });
 }
+
+
+
 function notifyUsers(message){
   
     const container = document.getElementById('container');
@@ -109,4 +115,24 @@ function notifyUsers(message){
     setTimeout(()=>{
         notification.remove();
     },2500)
+}
+
+function getCartDetails(){
+    axios.get('http://localhost:3000/cart').then((res)=>{
+        if(res.status === 200){
+res.data.products.forEach((product)=>{
+    var cartContainer = document.getElementById('cart');
+    cartContainer.innerHTML += `
+   <ul><li>${product.title}-${product.cartItem.quantity}-${product.price}</li></ul> 
+    `
+});
+document.querySelector('#cart').style = "display:block;"
+        }else{
+            throw new Error('Something went wrong')
+        }
+        console.log(res);
+    })
+    .catch((err)=>{
+        notifyUsers(err);
+    })
 }
